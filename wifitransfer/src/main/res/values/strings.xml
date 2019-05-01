@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">wifitransfer</string>
+    <string name="prologue_wifi_transfer"><![CDATA[Drag & drop files on this window or use the \"Upload Files…\" button to upload new files.]]></string>
+    <string name="we_need_permissions_to_save">We need permissions to download and save file.</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="permission_denied">Permision Denied</string>
+</resources>

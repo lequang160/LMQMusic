@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="white">#ffffff</color>
+    <color name="blue_dark">#306EAD</color>
+    <color name="blue_light">#4A90E2</color>
+    <color name="blue">#2287FD</color>
+    <color name="green">#02955F</color>
+    <color name="green_light">#48DB7D</color>
+    <color name="purple_light">#6E6EFF</color>
+    <color name="cyan_light">#00ACDE</color>
+    <color name="blue_gray">#708A9F</color>
+
+
+    <color name="gray_ca">#CACACA</color>
+    <color name="pink_light">#E30072</color>
+    <color name="color_dark">#585858</color>
+
+
+    <!--specific value-->
+    <color name="bottom_bar_color_active">#CF2237</color>
+    <color name="bottom_bar_color_inactive">#66000000</color>
+
+
+    <color name="border_color_item_google_drive">#66306EAD</color>
+    <color name="border_color_item_dropbox">#664A90E2</color>
+    <color name="border_color_item_one_driver">#6602955F</color>
+    <color name="border_color_item_browses">#66E30072</color>
+    <color name="border_color_item_local_songs">#6600ACDE</color>
+    <color name="border_color_item_wifi_transfers">#666E6EFF</color>
+    <color name="border_color_item_box_driver">#66585858</color>
+
+    <color name="divider">#EEEEEE</color>
+    <color name="color_background_playlist_sticky">#D8D8D8</color>
+    <color name="color_background_app">#ffffff</color>
+
+    <color name="purpleLight">#B26EFF</color>
+    <color name="gray">#ca9b9b9b</color>
+    <color name="background_bottom_bar">#FBFBFB</color>
+
+    <color name="pink_accent_200">#FF4081</color>
+
+    <color name="black">#FF000000</color>
+
+
+    <color name="disable_item_song">#c6c6c6</color>
+    <color name="background_item_disable_songe">#f9f9f9</color>
+</resources>

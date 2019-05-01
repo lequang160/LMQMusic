@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+
+    <tab
+        activeColor="@color/bottom_bar_color_active"
+        icon="@drawable/selector_dashboard"
+        id="@+id/tab_home"
+        inActiveColor="@color/bottom_bar_color_inactive"
+        title="@string/dashboard" />
+
+    <tab
+        activeColor="@color/bottom_bar_color_active"
+        icon="@drawable/selector_wifi_transfer"
+        id="@+id/tab_wifi_transfer"
+        inActiveColor="@color/bottom_bar_color_inactive"
+        title="@string/wifi_transfer" />
+
+    <tab
+        activeColor="@color/bottom_bar_color_active"
+        icon="@drawable/selector_settings"
+        id="@+id/tab_settings"
+        inActiveColor="@color/bottom_bar_color_inactive"
+        title="@string/settings" />
+
+</tabs>
