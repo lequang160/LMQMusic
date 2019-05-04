@@ -27,6 +27,7 @@ import com.example.lmqmusic.PlaylistDialogFragment;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
+import com.example.lmqmusic.ui.alarm.AlarmFragment;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
 import com.example.lmqmusic.ui.playlist_action.PlaylistActionBottomSheetFragment;
 
@@ -311,6 +312,8 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
                         getFragNav().showBottomSheetDialogFragment(PlaylistActionBottomSheetFragment.newInstance(song));
                         break;
                     case R.id.alarm:
+                        AlarmFragment alarmFragment = AlarmFragment.newInstance();
+                        getFragNav().pushFragment(alarmFragment);
                         break;
                 }
                 return true;

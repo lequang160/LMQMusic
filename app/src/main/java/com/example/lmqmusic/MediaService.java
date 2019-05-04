@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -27,7 +28,7 @@ import java.util.Random;
 public class MediaService extends Service {
     private final IBinder mBinder = new MediaBinder();
     private Notification status;
-    private static final String CHANNEL_ID = "TEST_CHANNEL";
+    private static final String CHANNEL_ID = "1997";
     private List<SongModel> songList = new ArrayList<>();
     private MediaPlayer mMediaPlayer;
     private boolean isRepeat = false;
@@ -37,6 +38,8 @@ public class MediaService extends Service {
     private boolean isPlaying = false;
     private long currentPosition;
     private Handler handler = new Handler();
+    CountDownTimer mAlarm;
+    private boolean isEndOfSong = false;
 
     @Override
     public void onDestroy() {
@@ -63,7 +66,7 @@ public class MediaService extends Service {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     currentPosition = 0;
-                    onCompleteMedia(isRepeat, isShuffle);
+                    onCompleteMedia(isRepeat, isShuffle, isEndOfSong);
                 }
             });
         } else {
@@ -71,20 +74,26 @@ public class MediaService extends Service {
         }
     }
 
-    private void onCompleteMedia(boolean isRepeat, boolean isShuffle) {
-        if(songList.size() > 0) {
+    private void onCompleteMedia(boolean isRepeat, boolean isShuffle, boolean isEndOfSong) {
+        if (songList.size() > 0) {
             //if isRepeat = true --> MediaPlayer.start()
             //else Next()
-            if (isRepeat) {
-                mMediaPlayer.start();
+            if (isEndOfSong) {
+                Next();
+                runCommand(Constants.ACTION.PAUSE_ACTION);
+                this.isEndOfSong = false;
             } else {
-                if (isShuffle) {
-                    //random index
-                    int position = new Random().nextInt(songList.size());
-                    currentIndex = position;
-                    PlayAtPosition(position);
+                if (isRepeat) {
+                    mMediaPlayer.start();
                 } else {
-                    Next();
+                    if (isShuffle) {
+                        //random index
+                        int position = new Random().nextInt(songList.size());
+                        currentIndex = position;
+                        PlayAtPosition(position);
+                    } else {
+                        runCommand(Constants.ACTION.NEXT_ACTION);
+                    }
                 }
             }
         }
@@ -119,7 +128,7 @@ public class MediaService extends Service {
         mMediaPlayer.pause();
         isPlaying = false;
         realTimePositionOfSong(isPlaying);
-        if(mListener != null)
+        if (mListener != null)
             mListener.onStateChanged(false);
     }
 
@@ -131,7 +140,7 @@ public class MediaService extends Service {
         currentIndex = position;
         SongModel song = songList.get(position);
         setDataSource(song);
-        Play();
+        runCommand(Constants.ACTION.PLAY_ACTION);
     }
 
     public int getCurrentIndex() {
@@ -183,7 +192,7 @@ public class MediaService extends Service {
                 Next();
                 break;
             case Constants.ACTION.STOPFOREGROUND_ACTION:
-                if(mMediaPlayer != null)
+                if (mMediaPlayer != null)
                     Pause();
                 stopForeground(true);
                 stopSelf();
@@ -192,19 +201,19 @@ public class MediaService extends Service {
                 Pause();
                 break;
         }
-        if(intent.getAction().equals(Constants.ACTION.MAIN_ACTION) || intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION))
-        {
-            if(mMediaPlayer != null && mListener != null) {
-                SongModel song;
-                song = songList.get(currentIndex);
-                mListener.onStateChanged(isPlaying);
-                mListener.onDataSourceChange(song);
-                mListener.onObserveCurrentPositionMediaPlayer(currentPosition);
-                createNotification(song.getDisplayName(), song.getArtist(), "", isPlaying);
-            }
-            return START_STICKY;
-        }
-        if(!intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
+//        if(intent.getAction().equals(Constants.ACTION.MAIN_ACTION) || intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION))
+//        {
+//            if(mMediaPlayer != null && mListener != null) {
+//                SongModel song;
+//                song = songList.get(currentIndex);
+//                mListener.onStateChanged(isPlaying);
+//                mListener.onDataSourceChange(song);
+//                mListener.onObserveCurrentPositionMediaPlayer(currentPosition);
+//                createNotification(song.getDisplayName(), song.getArtist(), "", isPlaying);
+//            }
+//            return START_STICKY;
+//        }
+        if (!intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             SongModel song;
             song = songList.get(currentIndex);
             createNotification(song.getDisplayName(), song.getArtist(), "", isPlaying);
@@ -224,13 +233,13 @@ public class MediaService extends Service {
     }
 
     private void createNotification(String songName, String artist, String playlist, boolean isPlaying) {
-// Using RemoteViews to bind custom layouts into Notification
+        // Using RemoteViews to bind custom layouts into Notification
         RemoteViews views = new RemoteViews(getPackageName(),
-                R.layout.status_bar);
+                R.layout.status_bar_expanded);
         RemoteViews bigViews = new RemoteViews(getPackageName(),
                 R.layout.status_bar_expanded);
 
-// showing default album image
+
         views.setViewVisibility(R.id.status_bar_icon, View.VISIBLE);
         views.setViewVisibility(R.id.status_bar_album_art, View.GONE);
 
@@ -301,7 +310,7 @@ public class MediaService extends Service {
         status.contentView = views;
         status.bigContentView = bigViews;
         status.flags = Notification.FLAG_ONGOING_EVENT;
-        status.icon = R.mipmap.ic_launcher;
+        status.icon = R.drawable.ic_music_player_song;
         status.contentIntent = pendingIntent;
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
@@ -322,27 +331,64 @@ public class MediaService extends Service {
         }
     }
 
-    private void realTimePositionOfSong(boolean isPlaying)
-    {
+    private void realTimePositionOfSong(boolean isPlaying) {
         currentPosition = 0;
-        if(isPlaying)
-        {
+        if (isPlaying) {
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     currentPosition = mMediaPlayer.getCurrentPosition();
-                    handler.postDelayed(this,1000);
+                    handler.postDelayed(this, 1000);
                 }
-            },1000);
-        }
-        else
-        {
+            }, 1000);
+        } else {
             handler.removeCallbacksAndMessages("");
         }
     }
 
     private void updateNotificationBigView(String songName, String artist, String playlist, boolean isPlaying) {
         createNotification(songName, artist, playlist, isPlaying);
+    }
+
+    public void setTimeAlarm(long time) {
+        releaseAlarm();
+        mAlarm = new CountDownTimer(time, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if (mMediaPlayer != null) {
+                    Intent serviceIntent = new Intent(getApplicationContext(), MediaService.class);
+                    serviceIntent.setAction(Constants.ACTION.PAUSE_ACTION);
+                    startService(serviceIntent);
+                }
+            }
+        };
+        mAlarm.start();
+    }
+
+    public void isEndOfSong(boolean isEndOfSong) {
+        this.isEndOfSong = isEndOfSong;
+        if (mAlarm != null) {
+            mAlarm.cancel();
+            mAlarm = null;
+        }
+    }
+
+    public void releaseAlarm() {
+        if (mAlarm != null) {
+            mAlarm.cancel();
+            mAlarm = null;
+        }
+    }
+
+    public void runCommand(String command) {
+        Intent serviceIntent = new Intent(Application.Context, MediaService.class);
+        serviceIntent.setAction(command);
+        Application.Context.startService(serviceIntent);
     }
 
     public class MediaBinder extends Binder {

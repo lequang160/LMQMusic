@@ -41,5 +41,10 @@
     <string name="cd_next">CD next</string>
     <string name="alarm">Alarm</string>
     <string name="remove">Remove</string>
+    <string name="end_of_this_song">End of this song</string>
+    <string name="minutes_60">1 hour</string>
+    <string name="minutes_30">30 minutes</string>
+    <string name="minutes_20">20 minutes</string>
+    <string name="minutes_15">15 minutes</string>
 
 </resources>

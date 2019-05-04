@@ -188,6 +188,8 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
 
     @Override
     public void pushFragment(Fragment fragment) {
+        if(slidingLayout != null && slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         mNavController.pushFragment(fragment);
     }
 
