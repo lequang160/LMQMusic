@@ -15,7 +15,7 @@ public class SongRealmObject extends RealmObject {
     private long date;
     private long duration;
     private long fileSize;
-    private boolean isFavorite;
+    private boolean isFavorite = false;
 
     public SongRealmObject(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, boolean isFavorite) {
         this.id = id;
@@ -123,5 +123,21 @@ public class SongRealmObject extends RealmObject {
 
     public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    @Override
+    public String toString() {
+        return "SongRealmObject{" +
+                "id=" + id +
+                ", artist='" + artist + '\'' +
+                ", title='" + title + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", streamUri='" + streamUri + '\'' +
+                ", albumId='" + albumId + '\'' +
+                ", date=" + date +
+                ", duration=" + duration +
+                ", fileSize=" + fileSize +
+                ", isFavorite=" + isFavorite +
+                '}';
     }
 }

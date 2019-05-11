@@ -25,10 +25,6 @@ import java.io.IOException;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 import static android.content.Context.WIFI_SERVICE;
 
-/**
- * Created by Thang Tran on 2/23/19.
- * Copyright © 2019 Hamado. All rights reserved.
- */
 public class WifiTransferControllerImpl implements WifiTransferController {
 
     private static volatile WifiTransferControllerImpl Instance = null;

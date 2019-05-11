@@ -46,7 +46,7 @@ public class MediaController {
 
     private void setDataSource(SongModel song) {
 
-        mMediaService.setDataSource(song);
+        mMediaService.setSongSource(song);
 
     }
 
@@ -116,8 +116,10 @@ public class MediaController {
     public interface PlayerListener {
         void onStateChanged(boolean isPlaying);
 
-        void onDataSourceChange(SongModel duration);
+        void onDataSourceChange(List<SongModel> duration);
 
-        void onObserveCurrentPositionMediaPlayer(long currentPosition);
+        void onObserveCurrentPositionMediaPlayer(long currentPosition, SongModel songModel);
+
+        void onSongChanged(SongModel song);
     }
 }

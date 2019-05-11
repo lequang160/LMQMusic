@@ -36,7 +36,6 @@ public class AppDataManager implements DataManager {
         dataLocalSong.addAll(getAllSong());
         dataNowPlaying = dataLocalSong;
         listPlaylist = getAllPlaylist();
-
     }
 
     public static AppDataManager getInstance() {
@@ -47,6 +46,8 @@ public class AppDataManager implements DataManager {
     }
 
     public List<SongModel> getDataLocalSong() {
+        this.dataLocalSong.clear();
+        this.dataLocalSong.addAll(ModelHelper.ConvertSongRealmObjectToSongModel(databaseHelper.getAllSong()));
         return this.dataLocalSong;
     }
 
@@ -94,7 +95,7 @@ public class AppDataManager implements DataManager {
 
     @Override
     public void addSongToPlaylist(long playlistId, SongRealmObject song) {
-        databaseHelper.addSongToPlaylist(playlistId,song);
+        databaseHelper.addSongToPlaylist(playlistId, song);
     }
 
     @Override

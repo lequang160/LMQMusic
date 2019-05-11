@@ -95,7 +95,7 @@
 //
 //        mediaController = MediaController.newInstance();
 //        mediaController.setListener(this);
-//        mediaController.setDataSource(data);
+//        mediaController.setSongSource(data);
 //        mediaController.PlayAtPosition(0);
 //
 //        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

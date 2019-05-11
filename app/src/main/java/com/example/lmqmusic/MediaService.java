@@ -19,6 +19,7 @@ import android.widget.RemoteViews;
 
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.splash.SplashActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class MediaService extends Service {
     private int currentIndex = 0;
     private MediaController.PlayerListener mListener;
     private boolean isPlaying = false;
-    private long currentPosition;
+    private long currentPosition = 0;
     private Handler handler = new Handler();
     CountDownTimer mAlarm;
     private boolean isEndOfSong = false;
@@ -50,6 +51,15 @@ public class MediaService extends Service {
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
+
+    public void onNotify(){
+        if (mListener != null) {
+            mListener.onStateChanged(isPlaying);
+            mListener.onDataSourceChange(songList);
+            mListener.onObserveCurrentPositionMediaPlayer(currentPosition, songList.size() > 0 ? songList.get(currentIndex) : null);
+        }
+    }
+
 
     @Override
     public void onCreate() {
@@ -97,7 +107,7 @@ public class MediaService extends Service {
                 }
             }
         }
-        //if isShuffle = true --> setDataSource() (Random)
+        //if isShuffle = true --> setSongSource() (Random)
     }
 
     public void Next() {
@@ -112,7 +122,7 @@ public class MediaService extends Service {
 
     public void Prepare(int position) {
         SongModel song = songList.get(position);
-        setDataSource(song);
+        setSongSource(song);
         isPlaying = false;
     }
 
@@ -139,7 +149,7 @@ public class MediaService extends Service {
     public void PlayAtPosition(int position) {
         currentIndex = position;
         SongModel song = songList.get(position);
-        setDataSource(song);
+        setSongSource(song);
         runCommand(Constants.ACTION.PLAY_ACTION);
     }
 
@@ -147,13 +157,13 @@ public class MediaService extends Service {
         return currentIndex;
     }
 
-    public void setDataSource(SongModel song) {
+    public void setSongSource(SongModel song) {
 
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(song.getStreamUri());
             mMediaPlayer.prepare();
-            mListener.onDataSourceChange(song);
+            mListener.onSongChanged(song);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -172,6 +182,7 @@ public class MediaService extends Service {
     public void setDataSource(List<SongModel> dataSource) {
         this.songList.clear();
         this.songList.addAll(dataSource);
+        mListener.onDataSourceChange(dataSource);
     }
 
     public void setListener(MediaController.PlayerListener mListener) {
@@ -243,7 +254,7 @@ public class MediaService extends Service {
         views.setViewVisibility(R.id.status_bar_icon, View.VISIBLE);
         views.setViewVisibility(R.id.status_bar_album_art, View.GONE);
 
-        Intent notificationIntent = new Intent(this, Main2Activity.class);
+        Intent notificationIntent = new Intent(this, SplashActivity.class);
         notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
@@ -390,6 +401,12 @@ public class MediaService extends Service {
         serviceIntent.setAction(command);
         Application.Context.startService(serviceIntent);
     }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
 
     public class MediaBinder extends Binder {
         public MediaService getService() {

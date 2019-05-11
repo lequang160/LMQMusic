@@ -5,17 +5,16 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.R;
-import com.example.lmqmusic.SongRealmObjectModel;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.main.Main2Activity;
@@ -35,6 +34,7 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
     private static final String[] READ_AND_WRITE = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
     List<SongRealmObject> data = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,8 +43,7 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
 
     }
 
-    private void goMain()
-    {
+    private void goMain() {
         Intent intent = new Intent(this, Main2Activity.class);
         this.startActivity(intent);
     }
@@ -54,13 +53,7 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
         if (hasLocationAndContactsPermissions()) {
             // Have permissions, do the thing!
             loadLocalSongs();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    goMain();
-                    finish();
-                }
-            },2000);
+
         } else {
             // Ask for both permissions
             EasyPermissions.requestPermissions(
@@ -166,12 +159,19 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
                 long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-                data.add(new SongRealmObject(Integer.valueOf(id),artist,title,displayName,streamUri,albumId,date,duration,fileSize));
-                AppDataManager.getInstance().saveSong(data.get(data.size()-1));
+                data.add(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize));
+                Log.d("data", new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize).toString());
+                AppDataManager.getInstance().saveSong(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize));
             }
             cursor.close();
         }
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                goMain();
+                finish();
+            }
+        }, 2000);
 
     }
 }

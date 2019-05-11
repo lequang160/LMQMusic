@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.Constants;
@@ -118,13 +117,10 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
         ButterKnife.bind(this, rootView);
 
         data.addAll(AppDataManager.getInstance().getAllSong());
-        if (data.size() > 0) {
-            mediaController = MediaController.newInstance();
-            mediaController.setListener(this);
-            mediaController.setDataSource(data);
-            mediaController.Prepare(0);
-            mediaController.createNotification();
-        }
+        mediaController = MediaController.newInstance();
+        mediaController.setListener(this);
+        Application.mService.onNotify();
+
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -174,6 +170,11 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+        if (song == null) {
+            getSliding().hideSliding();
+        } else {
+            getSliding().DownSliding();
+        }
         // TODO: Use the ViewModel
     }
 
@@ -253,6 +254,7 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     public void onStateChanged(boolean isPlaying) {
         this.isPlaying = isPlaying;
         if (isPlaying) {
+            getSliding().showSliding();
             mButtonPausePlayBack.setVisibility(View.VISIBLE);
             mButtonPlayPlayBack.setVisibility(View.INVISIBLE);
             mButtonPlay.setVisibility(View.INVISIBLE);
@@ -276,7 +278,28 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     }
 
     @Override
-    public void onDataSourceChange(SongModel song) {
+    public void onDataSourceChange(List<SongModel> songs) {
+        AppDataManager.getInstance().setDataNowPlaying(songs);
+    }
+
+    @Override
+    public void onObserveCurrentPositionMediaPlayer(long currentPosition, SongModel songModel) {
+        if (songModel == null) return;
+        this.song = songModel;
+        mTextSongName.setText(song.getTitle());
+        mTextSongArtist.setText(song.getArtist());
+        mSeekBar.setMax((int) song.getDuration());
+        mTextDuration.setText(new SimpleDateFormat("mm:ss", Locale.US).format(song.getDuration()));
+        mTextSongArtistPlayBack.setText(song.getArtist());
+        mTextSongNamePlayBack.setText(song.getTitle());
+        mButtonFavorite.setImageResource(song.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
+        mediaController.seekTo((int) currentPosition);
+        runCommand(isPlaying ? Constants.ACTION.PLAY_ACTION : Constants.ACTION.PAUSE_ACTION);
+        getSliding().showSliding();
+    }
+
+    @Override
+    public void onSongChanged(SongModel song) {
         this.song = song;
         mTextSongName.setText(song.getTitle());
         mTextSongArtist.setText(song.getArtist());
@@ -285,13 +308,7 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
         mTextSongArtistPlayBack.setText(song.getArtist());
         mTextSongNamePlayBack.setText(song.getTitle());
         mButtonFavorite.setImageResource(song.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-    }
-
-    @Override
-    public void onObserveCurrentPositionMediaPlayer(long currentPosition) {
-        mediaController.seekTo((int) currentPosition);
-        runCommand(isPlaying ? Constants.ACTION.PLAY_ACTION : Constants.ACTION.PAUSE_ACTION);
-        Toast.makeText(mActivity, "" + mediaController.getPosition(), Toast.LENGTH_SHORT).show();
+        getSliding().showSliding();
     }
 
     @OnClick(R.id.button_favorite)
@@ -338,5 +355,4 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
         serviceIntent.setAction(command);
         Application.Context.startService(serviceIntent);
     }
-
 }

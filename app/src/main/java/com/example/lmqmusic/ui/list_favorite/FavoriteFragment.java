@@ -59,7 +59,6 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
 
         View rootView = inflater.inflate(R.layout.favorite_fragment, container, false);
         ButterKnife.bind(this, rootView);
-        mData = mPresenter.getDataFavorite();
         setupRecycleView();
         return rootView;
     }
@@ -79,8 +78,8 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
         // TODO: Use the ViewModel
-
-        mViewModel.setData(AppDataManager.getInstance().getDataLocalSong());
+        mData = mPresenter.getDataFavorite();
+        mViewModel.setData(mData);
         mViewModel.getData().observe(this, new Observer<List<SongModel>>() {
             @Override
             public void onChanged(@Nullable List<SongModel> songModels) {

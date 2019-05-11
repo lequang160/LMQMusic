@@ -75,5 +75,8 @@ public abstract class BaseFragment extends DialogFragment {
 
     public interface SlidingUpPanelLayoutListener{
         void DownSliding();
+        void hideSliding();
+
+        void showSliding();
     }
 }

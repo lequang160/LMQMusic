@@ -1,32 +1,16 @@
 package com.example.lmqmusic.ui.main;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.example.lmqmusic.Application;
-import com.example.lmqmusic.Constants;
 import com.example.lmqmusic.MediaService;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.SongRealmObjectModel;
@@ -34,11 +18,6 @@ import com.example.lmqmusic.ui.base.activity.BaseActivity;
 import com.example.lmqmusic.ui.base.fragment.BaseFragment;
 import com.example.lmqmusic.ui.home.HomeFragment;
 import com.example.lmqmusic.ui.list_playlist.PlaylistFragment;
-import com.hamado.wifitransfer.WifiTransferController;
-import com.hamado.wifitransfer.WifiTransferControllerImpl;
-import com.hamado.wifitransfer.builder.HtmlDescription;
-import com.hamado.wifitransfer.callback.OnFileCallback;
-import com.hamado.wifitransfer.callback.WifiTransferListener;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavTransactionOptions;
 import com.roughike.bottombar.BottomBar;
@@ -49,7 +28,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +58,7 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
     private List<Fragment> fragments = new ArrayList<>();
     List<SongRealmObjectModel> data = new ArrayList<>();
     private FragNavController mNavController;
+
     @Override
     protected int getContentView() {
         return R.layout.activity_main2;
@@ -123,7 +102,9 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
 //            }
 //        });
 //        wifiTransferController.startWifiTransfer();
-    };
+    }
+
+    ;
 
 
     @Override
@@ -188,7 +169,7 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
 
     @Override
     public void pushFragment(Fragment fragment) {
-        if(slidingLayout != null && slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
+        if (slidingLayout != null && slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED)
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         mNavController.pushFragment(fragment);
     }
@@ -241,6 +222,20 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
     @Override
     public void DownSliding() {
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+    }
+
+    @Override
+    public void hideSliding() {
+        if (slidingLayout != null)
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+    }
+
+    @Override
+    public void showSliding() {
+        if (slidingLayout != null)
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
+
     }
 
     @Override

@@ -2,10 +2,7 @@ package com.hamado.wifitransfer.builder;
 
 import android.support.annotation.NonNull;
 
-/**
- * Created by Thang Tran on 12/25/18.
- * Copyright © 2018 Hamado. All rights reserved.
- */
+
 public class HtmlDescription {
 
     private String deviceName;
