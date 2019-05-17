@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -15,8 +16,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
+import com.bumptech.glide.Glide;
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.main.Main2Activity;
 import com.example.lmqmusic.ui.splash.SplashActivity;
@@ -227,7 +230,7 @@ public class MediaService extends Service {
         if (!intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             SongModel song;
             song = songList.get(currentIndex);
-            createNotification(song.getDisplayName(), song.getArtist(), "", isPlaying);
+            createNotification(song.getDisplayName(), song.getArtist(), "", song.getThumb(), isPlaying);
         }
         return START_STICKY;
     }
@@ -243,7 +246,7 @@ public class MediaService extends Service {
         return 0;
     }
 
-    private void createNotification(String songName, String artist, String playlist, boolean isPlaying) {
+    private void createNotification(String songName, String artist, String playlist, String thumb, boolean isPlaying) {
         // Using RemoteViews to bind custom layouts into Notification
         RemoteViews views = new RemoteViews(getPackageName(),
                 R.layout.status_bar_expanded);
@@ -316,6 +319,8 @@ public class MediaService extends Service {
 
         bigViews.setTextViewText(R.id.status_bar_album_name, playlist == null ? "" : playlist);
 
+        bigViews.setImageViewUri(R.id.status_bar_album_art, Uri.parse(thumb));
+
         if (status == null)
             status = new NotificationCompat.Builder(this, CHANNEL_ID).build();
         status.contentView = views;
@@ -357,9 +362,6 @@ public class MediaService extends Service {
         }
     }
 
-    private void updateNotificationBigView(String songName, String artist, String playlist, boolean isPlaying) {
-        createNotification(songName, artist, playlist, isPlaying);
-    }
 
     public void setTimeAlarm(long time) {
         releaseAlarm();

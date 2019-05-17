@@ -14,9 +14,10 @@ public class SongModel implements Parcelable {
     private long duration;
     private long fileSize;
     private boolean isFavorite;
+    private String thumb;
 
 
-    public SongModel(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, boolean isFavorite) {
+    public SongModel(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, boolean isFavorite, String thumb) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -27,32 +28,10 @@ public class SongModel implements Parcelable {
         this.duration = duration;
         this.fileSize = fileSize;
         this.isFavorite = isFavorite;
+        this.thumb = thumb;
     }
 
-    protected SongModel(Parcel in) {
-        id = in.readLong();
-        artist = in.readString();
-        title = in.readString();
-        displayName = in.readString();
-        streamUri = in.readString();
-        albumId = in.readString();
-        date = in.readLong();
-        duration = in.readLong();
-        fileSize = in.readLong();
-        isFavorite = in.readByte() != 0;
-    }
 
-    public static final Creator<SongModel> CREATOR = new Creator<SongModel>() {
-        @Override
-        public SongModel createFromParcel(Parcel in) {
-            return new SongModel(in);
-        }
-
-        @Override
-        public SongModel[] newArray(int size) {
-            return new SongModel[size];
-        }
-    };
 
     public long getId() {
         return id;
@@ -134,6 +113,14 @@ public class SongModel implements Parcelable {
         isFavorite = favorite;
     }
 
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -141,15 +128,42 @@ public class SongModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
-        dest.writeString(artist);
-        dest.writeString(title);
-        dest.writeString(displayName);
-        dest.writeString(streamUri);
-        dest.writeString(albumId);
-        dest.writeLong(date);
-        dest.writeLong(duration);
-        dest.writeLong(fileSize);
-        dest.writeByte((byte) (isFavorite ? 1 : 0));
+        dest.writeLong(this.id);
+        dest.writeString(this.artist);
+        dest.writeString(this.title);
+        dest.writeString(this.displayName);
+        dest.writeString(this.streamUri);
+        dest.writeString(this.albumId);
+        dest.writeLong(this.date);
+        dest.writeLong(this.duration);
+        dest.writeLong(this.fileSize);
+        dest.writeByte(this.isFavorite ? (byte) 1 : (byte) 0);
+        dest.writeString(this.thumb);
     }
+
+    protected SongModel(Parcel in) {
+        this.id = in.readLong();
+        this.artist = in.readString();
+        this.title = in.readString();
+        this.displayName = in.readString();
+        this.streamUri = in.readString();
+        this.albumId = in.readString();
+        this.date = in.readLong();
+        this.duration = in.readLong();
+        this.fileSize = in.readLong();
+        this.isFavorite = in.readByte() != 0;
+        this.thumb = in.readString();
+    }
+
+    public static final Creator<SongModel> CREATOR = new Creator<SongModel>() {
+        @Override
+        public SongModel createFromParcel(Parcel source) {
+            return new SongModel(source);
+        }
+
+        @Override
+        public SongModel[] newArray(int size) {
+            return new SongModel[size];
+        }
+    };
 }

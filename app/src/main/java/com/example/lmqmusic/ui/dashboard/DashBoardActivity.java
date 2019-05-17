@@ -56,10 +56,7 @@ public class DashBoardActivity extends BaseActivity implements IView {
                     case 3:
                         mPresenter.goFavorite();
                         break;
-                    case 4:
-                        mPresenter.goArtist();
-                        break;
-                    case 6:
+                    case 5:
                         mPresenter.goWifiTransfer();
                         break;
                 }

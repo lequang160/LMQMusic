@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +47,9 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
 
     @BindView(R.id.search_song)
     SearchView mSearchView;
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
+
 
     SongViewModel mViewModel;
     Handler handler = new Handler();
@@ -112,6 +116,7 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
                     mAdapter.replaceData(songModels);
                     data.clear();
                     data.addAll(songModels);
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
 
             }
@@ -137,6 +142,12 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
             }
         });
 
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mViewModel.setData(AppDataManager.getInstance().getDataLocalSong());
+            }
+        });
     }
 
     @OnClick(R.id.button_back)

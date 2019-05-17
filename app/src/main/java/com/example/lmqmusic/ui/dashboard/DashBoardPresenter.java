@@ -4,7 +4,9 @@ import android.content.Intent;
 
 import com.example.lmqmusic.data.model.Item;
 import com.example.lmqmusic.ui.base.activity.BasePresenter;
+import com.example.lmqmusic.ui.main.Main2Activity;
 import com.example.lmqmusic.ui.song.SongFragment;
+import com.example.lmqmusic.ui.wifi_transfer.WifiTransferFragment;
 
 import java.util.List;
 
@@ -32,7 +34,8 @@ public class DashBoardPresenter<V extends IView> extends BasePresenter<V> implem
 
     @Override
     public void goWifiTransfer() {
-
+        WifiTransferFragment wifiTransferFragment = new WifiTransferFragment();
+        ((Main2Activity)(getMvpView().getActivity())).pushFragment(wifiTransferFragment);
     }
 
     @Override

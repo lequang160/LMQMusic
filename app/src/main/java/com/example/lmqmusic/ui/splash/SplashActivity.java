@@ -2,6 +2,7 @@ package com.example.lmqmusic.ui.splash;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,6 +19,9 @@ import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.utils.FileUtils;
+import com.example.lmqmusic.utils.LocalSongsHelper;
+import com.hamado.wifitransfer.utils.FileHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +56,19 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
     public void readAndWriteStore() {
         if (hasLocationAndContactsPermissions()) {
             // Have permissions, do the thing!
-            loadLocalSongs();
+            LocalSongsHelper.loadLocalSongs(new LocalSongsHelper.ReadFileListener() {
+                @Override
+                public void onDoneScanFile(Object o) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            goMain();
+                            finish();
+                        }
+                    },2000);
+                }
+            });
 
         } else {
             // Ask for both permissions
@@ -114,7 +130,9 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
 
     private void loadLocalSongs() {
 
-
+        String appPath = Environment.getExternalStorageDirectory().toString() + "/" + "LMQ Music";
+        //selection = selection + " AND (" + MediaStore.Audio.Media.DATA + " NOT LIKE '" + appPath + "/%')";
+        boolean deleted = FileUtils.deleteFile(appPath + "/.nomedia");
         final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Application.Context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
 
@@ -138,10 +156,6 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
 
 
-        String appPath = Environment.getExternalStorageDirectory().toString() + "/" + getApplicationContext().getString(R.string.app_name);
-        selection = selection + " AND (" + MediaStore.Audio.Media.DATA + " NOT LIKE '" + appPath + "/%')";
-
-
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         Cursor cursor = cr.query(uri, projection, selection, null, sortOrder);
 
@@ -155,13 +169,14 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
                 String albumId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
                 String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 String artistId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
+                String thumb = getPathAlbumArt(albumId, this);
                 long date = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
                 long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-                data.add(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize));
-                Log.d("data", new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize).toString());
-                AppDataManager.getInstance().saveSong(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize));
+                data.add(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
+                Log.d("data", new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb).toString());
+                AppDataManager.getInstance().saveSong(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
             }
             cursor.close();
         }
@@ -174,4 +189,80 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
         }, 2000);
 
     }
+
+    private static String getPathAlbumArt(String albumId, Context context) {
+        if (albumId == null) return "";
+        Uri externalContentUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        String[] projection = {MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART};
+        String selection = MediaStore.Audio.Albums._ID + "=?";
+        String[] selectionArgs = {albumId};
+        Cursor cursor = context.getContentResolver().query(externalContentUri,
+                projection,
+                selection,
+                selectionArgs,
+                null);
+
+        if (cursor == null) return "";
+
+        if (cursor.moveToFirst()) {
+            String albumArt = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+            return albumArt == null ? "" : albumArt;
+        }
+        cursor.close();
+        return "";
+    }
+
+    public static void loadStorageSongs(final boolean katrinaMusic, final Context context) {
+
+        final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Application.Context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+        String appPath = Environment.getExternalStorageDirectory().toString() + "/" + "LMQ Music";
+
+        //Some audio may be explicitly marked as not being music
+        String[] projection = {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.SIZE,
+
+        };
+
+        ContentResolver cr = context.getContentResolver();
+
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
+
+        if (katrinaMusic) {
+            boolean deleted = FileUtils.deleteFile(appPath + "/.nomedia");
+          //  selection = selection + " AND (" + MediaStore.Audio.Media.DATA + " LIKE '" + appPath + "/%')";
+        } else {
+          //  selection = selection + " AND (" + MediaStore.Audio.Media.DATA + " LIKE '" + appPath + "/%')";
+        }
+
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+        Cursor cursor = cr.query(uri, projection, selection, null, sortOrder);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                String streamUri = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                String albumId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                long date = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
+                long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
+
+                // find song in database
+            }
+            cursor.close();
+        }
+    }
+
+
 }

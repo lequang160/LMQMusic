@@ -46,5 +46,9 @@
     <string name="minutes_30">30 minutes</string>
     <string name="minutes_20">20 minutes</string>
     <string name="minutes_15">15 minutes</string>
-
+    <string name="enter_a_url_in_the_address_bar_of_your_computer_s_browser">Enter a URL in the address bar of your computer’s browser:</string>
+    <string name="make_sure_both_your_computer_and_your">Make sure both your computer and your device are using the same network. Once you get there, follow the instructions appeared.</string>
+    <string name="press_on_finish_to_turn_off_wi_fi_transfer_signal">Press on Finish to turn off Wi-Fi transfer signal.</string>
+    <string name="finish">Finish</string>
+    <string name="link_connect_wifi_transfer">http://%s:%s</string>
 </resources>

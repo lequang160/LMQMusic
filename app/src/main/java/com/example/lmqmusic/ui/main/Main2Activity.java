@@ -1,23 +1,40 @@
 package com.example.lmqmusic.ui.main;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.MediaService;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.SongRealmObjectModel;
+import com.example.lmqmusic.data.AppDataManager;
+import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.base.activity.BaseActivity;
 import com.example.lmqmusic.ui.base.fragment.BaseFragment;
 import com.example.lmqmusic.ui.home.HomeFragment;
 import com.example.lmqmusic.ui.list_playlist.PlaylistFragment;
+import com.example.lmqmusic.ui.wifi_transfer.WifiTransferFragment;
+import com.example.lmqmusic.utils.LocalSongsHelper;
+import com.hamado.wifitransfer.WifiTransferController;
+import com.hamado.wifitransfer.WifiTransferControllerImpl;
+import com.hamado.wifitransfer.builder.HtmlDescription;
+import com.hamado.wifitransfer.callback.OnFileCallback;
+import com.hamado.wifitransfer.callback.WifiTransferListener;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavTransactionOptions;
 import com.roughike.bottombar.BottomBar;
@@ -28,6 +45,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +68,7 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
     LinearLayout layoutBottomBar;
 
     HomeFragment homeFragment = HomeFragment.newInstance();
-    PlaylistFragment wifiTransferFragment = PlaylistFragment.newInstance();
+    HomeFragment wifiTransferFragment = HomeFragment.newInstance();
     HomeFragment settingsFragment = HomeFragment.newInstance();
     private final int TAB_HOME = FragNavController.TAB1;
     private final int TAB_WIFI_TRANSFER = FragNavController.TAB2;
@@ -68,43 +86,12 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
     protected void initViews(@Nullable Bundle savedInstanceState) {
         initBottomBar(savedInstanceState);
         initSlidingLayout();
-//        WifiTransferController wifiTransferController = WifiTransferControllerImpl.getInstance(this, new HtmlDescription("device","LMQ Music", "LMQ Music","LMQ Music", "footer"), "LMQ Music");
-//        wifiTransferController.setWifiTransferListener(new WifiTransferListener() {
-//            @Override
-//            public void wifiTransferStarted(int port, String formatIpAddress) {
-//                Log.d("QUANG", formatIpAddress + ":" + port);
-//            }
-//
-//            @Override
-//            public void wifiTransferStopped() {
-//                Toast.makeText(getApplicationContext(), "wifiTransferStopped", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onLostConnection() {
-//                Toast.makeText(getApplicationContext(), "onLostConnection", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onConnectionReconnected() {
-//                Toast.makeText(getApplicationContext(), "onConnectionReconnected", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        wifiTransferController.setFileCallback(new OnFileCallback() {
-//            @Override
-//            public void onUploadFileSuccess(File file) {
-//                Toast.makeText(getApplicationContext(), "File uploaded", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onFileDeleted(File file) {
-//                Toast.makeText(getApplicationContext(), "File Deleted", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        wifiTransferController.startWifiTransfer();
+
     }
 
-    ;
+
+
+
 
 
     @Override
@@ -127,7 +114,7 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
                 return homeFragment;
 
             case TAB_WIFI_TRANSFER:
-                return wifiTransferFragment;
+                return homeFragment;
 
             case TAB_SETTINGS:
                 return settingsFragment;
@@ -256,7 +243,6 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
         serviceIntent.setAction(command);
         Application.Context.startService(serviceIntent);
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

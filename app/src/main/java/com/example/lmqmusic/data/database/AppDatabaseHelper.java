@@ -1,6 +1,7 @@
 package com.example.lmqmusic.data.database;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.lmqmusic.Application;
@@ -116,15 +117,31 @@ public class AppDatabaseHelper implements DatabaseHelper {
 
     @Override
     public void saveSong(SongRealmObject song) {
-        mRealm.executeTransaction(new Realm.Transaction() {
+
+        mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 SongRealmObject res = realm.where(SongRealmObject.class).equalTo("id", song.getId()).findFirst();
                 if (res == null) {
                     realm.insert(song);
+                    Log.d("ABCCC : ", song.getDisplayName()+"");
+                }else{
+                    Log.d("ABCCC : ", res.getDisplayName());
                 }
             }
         });
+//        mRealm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm realm) {
+//                SongRealmObject res = realm.where(SongRealmObject.class).equalTo("id", song.getId()).findFirst();
+//                if (res == null) {
+//                    realm.insert(song);
+//                    Log.d("ABCCC : ", song.getDisplayName()+"");
+//                }else{
+//                    Log.d("ABCCC : ", res.getDisplayName());
+//                }
+//            }
+//        });
     }
 
     @Override

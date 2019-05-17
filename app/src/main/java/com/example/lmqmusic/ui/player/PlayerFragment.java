@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageButton;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.Constants;
 import com.example.lmqmusic.MediaController;
@@ -38,6 +40,7 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implements MediaController.PlayerListener, IPlayer {
 
@@ -99,6 +102,12 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
 
     @BindView(R.id.button_shuffle)
     AppCompatImageButton mButtonShuffle;
+
+    @BindView(R.id.image_song)
+    CircleImageView mLogo;
+
+    @BindView(R.id.image_playback)
+    AppCompatImageView mImagePlayback;
 
     List<SongModel> data = new ArrayList<>();
 
@@ -286,6 +295,8 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     public void onObserveCurrentPositionMediaPlayer(long currentPosition, SongModel songModel) {
         if (songModel == null) return;
         this.song = songModel;
+        Glide.with(this).load(songModel.getThumb()).dontTransform().dontAnimate().into(mLogo);
+        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mImagePlayback);
         mTextSongName.setText(song.getTitle());
         mTextSongArtist.setText(song.getArtist());
         mSeekBar.setMax((int) song.getDuration());
@@ -301,6 +312,9 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     @Override
     public void onSongChanged(SongModel song) {
         this.song = song;
+        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mLogo);
+        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mImagePlayback);
+
         mTextSongName.setText(song.getTitle());
         mTextSongArtist.setText(song.getArtist());
         mSeekBar.setMax((int) song.getDuration());

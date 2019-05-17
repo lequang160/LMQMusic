@@ -22,6 +22,7 @@ import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
 import com.example.lmqmusic.ui.list_favorite.FavoriteFragment;
 import com.example.lmqmusic.ui.list_playlist.PlaylistFragment;
 import com.example.lmqmusic.ui.song.SongFragment;
+import com.example.lmqmusic.ui.wifi_transfer.WifiTransferFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,10 @@ public class HomeFragment extends FragmentMVP<HomePresenter,IHome> implements IH
                     case 4:
                         FavoriteFragment favoriteFragment = FavoriteFragment.newInstance();
                         getFragNav().pushFragment(favoriteFragment);
+                        break;
+                    case 6:
+                        WifiTransferFragment wifiTransferFragment = new WifiTransferFragment();
+                        getFragNav().pushFragment(wifiTransferFragment);
                         break;
                 }
             }

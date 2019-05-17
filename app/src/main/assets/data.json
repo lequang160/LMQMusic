@@ -30,12 +30,6 @@
         "image":"ic_playlistfavorite"
     },
     {
-        "type":3,
-        "title":"Artists",
-        "icon":"ic_artist",
-        "image":"ic_artist"
-    },
-    {
         "type":2,
         "title":"Services",
         "icon":"",

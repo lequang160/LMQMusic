@@ -16,8 +16,9 @@ public class SongRealmObject extends RealmObject {
     private long duration;
     private long fileSize;
     private boolean isFavorite = false;
+    private String thumb;
 
-    public SongRealmObject(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, boolean isFavorite) {
+    public SongRealmObject(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, boolean isFavorite, String thumb) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -28,6 +29,7 @@ public class SongRealmObject extends RealmObject {
         this.duration = duration;
         this.fileSize = fileSize;
         this.isFavorite = isFavorite;
+        this.thumb = thumb;
     }
 
     public boolean isFavorite() {
@@ -41,7 +43,7 @@ public class SongRealmObject extends RealmObject {
     public SongRealmObject() {
     }
 
-    public SongRealmObject(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize) {
+    public SongRealmObject(long id, String artist, String title, String displayName, String streamUri, String albumId, long date, long duration, long fileSize, String thumb) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -51,6 +53,15 @@ public class SongRealmObject extends RealmObject {
         this.date = date;
         this.duration = duration;
         this.fileSize = fileSize;
+        this.thumb = thumb;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
     }
 
     public long getId() {

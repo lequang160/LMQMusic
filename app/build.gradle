@@ -65,4 +65,6 @@ dependencies {
     implementation 'com.roughike:bottom-bar:2.3.1'
     implementation project(':wifitransfer')
     implementation files('libs/GenerateMVP.jar')
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 }
