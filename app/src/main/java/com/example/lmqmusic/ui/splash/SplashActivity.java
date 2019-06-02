@@ -17,10 +17,12 @@ import android.util.Log;
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
+import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.main.Main2Activity;
 import com.example.lmqmusic.utils.FileUtils;
 import com.example.lmqmusic.utils.LocalSongsHelper;
+import com.example.lmqmusic.utils.ModelHelper;
 import com.hamado.wifitransfer.utils.FileHelper;
 
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
     private static final int REQUEST_PERMISSION_READ_WRITE_EXTERNAL_STORAGE_CODE = 22;
     private static final String[] READ_AND_WRITE = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
 
-    List<SongRealmObject> data = new ArrayList<>();
+    List<SongModel> data = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,11 +176,15 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
                 long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-                data.add(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
-                Log.d("data", new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb).toString());
-                AppDataManager.getInstance().saveSong(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
+                data.add(new SongModel(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize,false, thumb));
             }
             cursor.close();
+            for(SongModel songModel: data)
+            {
+                if(songModel.isFavorite())
+                    Log.e("ABC",songModel.getDisplayName());
+            }
+            AppDataManager.getInstance().setDataSongLocal(data);
         }
         new Handler().postDelayed(new Runnable() {
             @Override

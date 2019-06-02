@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface IFavoritePresenter  {
     List<SongModel> getDataFavorite();
+    void updateSong(SongModel songModel);
 }

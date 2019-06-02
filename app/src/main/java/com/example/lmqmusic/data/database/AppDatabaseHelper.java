@@ -230,4 +230,27 @@ public class AppDatabaseHelper implements DatabaseHelper {
             }
         });
     }
+
+    @Override
+    public void updatePlaylist(PlayListRealmObject playListRealmObject) {
+        mRealm.executeTransaction(new Realm.Transaction() { // must be in transaction for this to work
+            @Override
+            public void execute(Realm realm) {
+                if (playListRealmObject.getId() > 0) {
+                    realm.insertOrUpdate(playListRealmObject);
+                } else {
+                    // increment index
+                    Number currentIdNum = realm.where(PlayListRealmObject.class).max("id");
+                    int nextId;
+                    if (currentIdNum == null) {
+                        nextId = 1;
+                    } else {
+                        nextId = currentIdNum.intValue() + 1;
+                    }
+                    playListRealmObject.setId(nextId);
+                    realm.insertOrUpdate(playListRealmObject);
+                }
+            }
+        });
+    }
 }

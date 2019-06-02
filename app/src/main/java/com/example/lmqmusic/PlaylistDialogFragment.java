@@ -9,15 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.adapter.NowPlayListAdapter;
 import com.example.lmqmusic.ui.main.Main2Activity;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +33,7 @@ public class PlaylistDialogFragment extends BottomSheetDialogFragment {
     private NowPlayListAdapter mAdapter;
     private int currentIndex = 0;
 
+
     // TODO: Customize parameters
     public static PlaylistDialogFragment newInstance() {
         final PlaylistDialogFragment fragment = new PlaylistDialogFragment();
@@ -48,7 +48,7 @@ public class PlaylistDialogFragment extends BottomSheetDialogFragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_item_list_dialog, container, false);
         mRecyclerView = root.findViewById(R.id.list);
-
+        currentIndex = Application.mService.getCurrentIndex();
         ButterKnife.bind(root);
         return root;
     }
@@ -57,8 +57,7 @@ public class PlaylistDialogFragment extends BottomSheetDialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mData.addAll(AppDataManager.getInstance().getDataNowPlaying());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter = new NowPlayListAdapter(mData);
-
+        mAdapter = new NowPlayListAdapter(mData, NowPlayListAdapter.AdapterType.NOW_PLAYING);
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view1 = layoutInflater.inflate(R.layout.item_dashboard, null, false);
         mRecyclerView.setAdapter(mAdapter);
@@ -71,8 +70,26 @@ public class PlaylistDialogFragment extends BottomSheetDialogFragment {
                 ((Main2Activity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
             }
         });
+        mRecyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                View imageSync = mAdapter.getViewByPosition(mRecyclerView, currentIndex, R.id.image_sync);
+                if(imageSync != null)imageSync.setVisibility(View.VISIBLE);
+            }
+        });
 
-        currentIndex = MediaController.newInstance().getCurrentIndex();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
     }
 
     @Override

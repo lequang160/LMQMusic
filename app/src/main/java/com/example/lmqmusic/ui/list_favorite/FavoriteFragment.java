@@ -1,19 +1,27 @@
 package com.example.lmqmusic.ui.list_favorite;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.example.lmqmusic.Application;
 import com.example.lmqmusic.Constants;
 import com.example.lmqmusic.MediaController;
 import com.example.lmqmusic.R;
@@ -44,6 +52,9 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
 
     @BindView(R.id.search_song)
     SearchView mSearchView;
+
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     Handler handler = new Handler();
 
@@ -77,9 +88,8 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
-        // TODO: Use the ViewModel
-        mData = mPresenter.getDataFavorite();
-        mViewModel.setData(mData);
+        // TODO: Use the ViewMode
+        mViewModel.setData(mPresenter.getDataFavorite());
         mViewModel.getData().observe(this, new Observer<List<SongModel>>() {
             @Override
             public void onChanged(@Nullable List<SongModel> songModels) {
@@ -87,6 +97,7 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
                     mAdapter.replaceData(songModels);
                     mData.clear();
                     mData.addAll(songModels);
+                    mSwipeRefreshLayout.setRefreshing(false);
                 }
 
             }
@@ -121,11 +132,23 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
             }
         });
 
+        mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                showPopupOption(view, adapter, position);
+            }
+        });
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mViewModel.setData(mPresenter.getDataFavorite());
+            }
+        });
 
     }
 
     private void setupRecycleView() {
-        mAdapter = new NowPlayListAdapter(mData);
+        mAdapter = new NowPlayListAdapter(mData, NowPlayListAdapter.AdapterType.FAVORITE);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -135,9 +158,37 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
         mRecyclerView.setAdapter(mAdapter);
     }
 
+    @SuppressLint("RestrictedApi")
+    private void showPopupOption(View v, BaseQuickAdapter adapter, int position) {
+
+        SongModel song = ((SongModel) adapter.getData().get(position));
+        PopupMenu popup = new PopupMenu(Application.Context, v);
+        popup.getMenuInflater().inflate(R.menu.favorite_menu, popup.getMenu());
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem menu_item) {
+                switch (menu_item.getItemId()) {
+                    case R.id.remove_song:
+                        SongModel songModel = (SongModel) adapter.getData().get(position);
+                        songModel.setFavorite(false);
+                        mPresenter.updateSong(songModel);
+                        mData = mPresenter.getDataFavorite();
+                        mViewModel.setData(mData);
+                        break;
+
+                }
+                return true;
+            }
+        });
+
+        MenuPopupHelper menuHelper = new MenuPopupHelper(v.getContext(), (MenuBuilder) popup.getMenu(), v);
+        menuHelper.setForceShowIcon(true);
+        menuHelper.setGravity(Gravity.END);
+        menuHelper.show();
+    }
+
     @OnClick(R.id.button_back)
-    void clickBack()
-    {
+    void clickBack() {
         getFragNav().popFragment();
     }
 

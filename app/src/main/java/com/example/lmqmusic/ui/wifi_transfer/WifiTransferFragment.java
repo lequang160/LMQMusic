@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
+import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.base.fragment.PermissionFragmentMVP;
 import com.example.lmqmusic.utils.LocalSongsHelper;
@@ -95,13 +96,13 @@ public class WifiTransferFragment extends PermissionFragmentMVP<WifiTransferPres
 
                 LocalSongsHelper.loadLocalSong(file.getPath(), Application.Context, new LocalSongsHelper.ReadFileListener() {
                     @Override
-                    public void onDoneScanFile(Object o) {
-                        if(o instanceof SongRealmObject)
+                    public void onDoneScanFile(Object ob) {
+                        if(ob instanceof SongModel)
                         {
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    AppDataManager.getInstance().saveSong((SongRealmObject) o);
+                                    AppDataManager.getInstance().saveSong((SongModel) ob);
                                     new CountDownTimer(1000,1000){
 
                                         @Override

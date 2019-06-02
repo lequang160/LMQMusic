@@ -51,4 +51,5 @@
     <string name="press_on_finish_to_turn_off_wi_fi_transfer_signal">Press on Finish to turn off Wi-Fi transfer signal.</string>
     <string name="finish">Finish</string>
     <string name="link_connect_wifi_transfer">http://%s:%s</string>
+    <string name="favorite">Favorite</string>
 </resources>

@@ -16,12 +16,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 
-import com.bumptech.glide.Glide;
 import com.example.lmqmusic.data.model.SongModel;
-import com.example.lmqmusic.ui.main.Main2Activity;
 import com.example.lmqmusic.ui.splash.SplashActivity;
 
 import java.io.IOException;
@@ -44,6 +41,7 @@ public class MediaService extends Service {
     private Handler handler = new Handler();
     CountDownTimer mAlarm;
     private boolean isEndOfSong = false;
+    NotificationManager notificationManager;
 
     @Override
     public void onDestroy() {
@@ -55,7 +53,7 @@ public class MediaService extends Service {
         return mBinder;
     }
 
-    public void onNotify(){
+    public void onNotify() {
         if (mListener != null) {
             mListener.onStateChanged(isPlaying);
             mListener.onDataSourceChange(songList);
@@ -249,9 +247,9 @@ public class MediaService extends Service {
     private void createNotification(String songName, String artist, String playlist, String thumb, boolean isPlaying) {
         // Using RemoteViews to bind custom layouts into Notification
         RemoteViews views = new RemoteViews(getPackageName(),
-                R.layout.status_bar_expanded);
+                R.layout.status_bar);
         RemoteViews bigViews = new RemoteViews(getPackageName(),
-                R.layout.status_bar_expanded);
+                R.layout.status_bar/*_expanded*/);
 
 
         views.setViewVisibility(R.id.status_bar_icon, View.VISIBLE);
@@ -283,11 +281,6 @@ public class MediaService extends Service {
         PendingIntent pnextIntent = PendingIntent.getService(this, 0,
                 nextIntent, 0);
 
-        Intent closeIntent = new Intent(this, MediaService.class);
-        closeIntent.setAction(Constants.ACTION.STOPFOREGROUND_ACTION);
-        PendingIntent pcloseIntent = PendingIntent.getService(this, 0,
-                closeIntent, 0);
-
         if (!isPlaying) {
             views.setOnClickPendingIntent(R.id.status_bar_play, pplayIntent);
             bigViews.setOnClickPendingIntent(R.id.status_bar_play, pplayIntent);
@@ -303,9 +296,6 @@ public class MediaService extends Service {
         views.setOnClickPendingIntent(R.id.status_bar_prev, ppreviousIntent);
         bigViews.setOnClickPendingIntent(R.id.status_bar_prev, ppreviousIntent);
 
-        views.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
-        bigViews.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
-
         views.setImageViewResource(R.id.status_bar_play,
                 isPlaying ? R.drawable.ic_pause : R.drawable.ic_play);
         bigViews.setImageViewResource(R.id.status_bar_play,
@@ -319,16 +309,23 @@ public class MediaService extends Service {
 
         bigViews.setTextViewText(R.id.status_bar_album_name, playlist == null ? "" : playlist);
 
-        bigViews.setImageViewUri(R.id.status_bar_album_art, Uri.parse(thumb));
+        bigViews.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
+        views.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
 
         if (status == null)
-            status = new NotificationCompat.Builder(this, CHANNEL_ID).build();
+            status = new NotificationCompat.Builder(this, CHANNEL_ID).setAutoCancel(!isPlaying).build();
         status.contentView = views;
         status.bigContentView = bigViews;
-        status.flags = Notification.FLAG_ONGOING_EVENT;
         status.icon = R.drawable.ic_music_player_song;
         status.contentIntent = pendingIntent;
-        startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+
+        // hide the notification after its selected
+        if(isPlaying) {
+            status.flags = Notification.FLAG_FOREGROUND_SERVICE;
+        }else{
+            status.flags = Notification.FLAG_AUTO_CANCEL;
+        }
+        startForeground(Constants.NOTIFICATION_ID, status);
     }
 
     private void createNotificationChannel() {
@@ -342,7 +339,7 @@ public class MediaService extends Service {
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
     }

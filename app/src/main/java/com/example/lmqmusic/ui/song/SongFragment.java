@@ -1,7 +1,6 @@
 package com.example.lmqmusic.ui.song;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleOwner;
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -9,26 +8,31 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.example.lmqmusic.Application;
 import com.example.lmqmusic.Constants;
 import com.example.lmqmusic.MediaController;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.adapter.NowPlayListAdapter;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
-import com.example.lmqmusic.ui.list_favorite.FavoriteViewModel;
 import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.playlist_action.PlaylistActionBottomSheetFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +97,7 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
     }
 
     private void setupRecycleView() {
-        mAdapter = new NowPlayListAdapter(null);
+        mAdapter = new NowPlayListAdapter(null, NowPlayListAdapter.AdapterType.SONG_FRAGMENT);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
@@ -103,6 +107,7 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
     }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -112,13 +117,26 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
         mViewModel.getData().observe(this, new Observer<List<SongModel>>() {
             @Override
             public void onChanged(@Nullable List<SongModel> songModels) {
-                if(songModels != null) {
+                if (songModels != null) {
                     mAdapter.replaceData(songModels);
                     data.clear();
                     data.addAll(songModels);
+                    for(SongModel songModel: songModels)
+                    {
+                        if(songModel.isFavorite())
+                            Log.e("ABC",songModel.getDisplayName());
+                    }
                     mSwipeRefreshLayout.setRefreshing(false);
                 }
 
+            }
+        });
+
+        mAdapter.setType(NowPlayListAdapter.AdapterType.SONG_FRAGMENT);
+        mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                showPopupOption(view, adapter, position);
             }
         });
 
@@ -137,7 +155,7 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
                     public void run() {
                         mViewModel.search(s);
                     }
-                },300);
+                }, 300);
                 return false;
             }
         });
@@ -150,9 +168,33 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
         });
     }
 
+    @SuppressLint("RestrictedApi")
+    private void showPopupOption(View v, BaseQuickAdapter adapter, int position) {
+        PopupMenu popup = new PopupMenu(Application.Context, v);
+        popup.getMenuInflater().inflate(R.menu.song_fragment_menu, popup.getMenu());
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem menu_item) {
+                switch (menu_item.getItemId()) {
+                    case R.id.favorite_song:
+                        AppDataManager.getInstance().setFavorite((int)((SongModel) adapter.getData().get(position)).getId());
+                        break;
+                    case R.id.add_to_playlist:
+                        getFragNav().showBottomSheetDialogFragment(PlaylistActionBottomSheetFragment.newInstance((SongModel)adapter.getData().get(position)));
+                        break;
+                }
+                return true;
+            }
+        });
+
+        MenuPopupHelper menuHelper = new MenuPopupHelper(getContext(), (MenuBuilder) popup.getMenu(), v);
+        menuHelper.setForceShowIcon(true);
+        menuHelper.setGravity(Gravity.END);
+        menuHelper.show();
+    }
+
     @OnClick(R.id.button_back)
-    void clickBack()
-    {
+    void clickBack() {
         getFragNav().popFragment();
     }
 }

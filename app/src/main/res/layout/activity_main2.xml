@@ -29,12 +29,12 @@
             android:layout_height="match_parent"
             android:name="com.example.lmqmusic.ui.player.PlayerFragment"/>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-
     <LinearLayout
         android:id="@+id/layout_bottom_bar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible">
         <com.roughike.bottombar.BottomBar
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"

@@ -8,11 +8,10 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.data.AppDataManager;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
+import com.example.lmqmusic.data.model.SongModel;
 import com.hamado.wifitransfer.utils.FileHelper;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public final class LocalSongsHelper {
 
     public static void loadLocalSongs(ReadFileListener readFileListener) {
 
-        List<SongRealmObject> data = new ArrayList<>();
+        List<SongModel> data = new ArrayList<>();
         String appPath = Environment.getExternalStorageDirectory().toString() + "/" + "LMQ Music";
         boolean deleted = FileUtils.deleteFile(appPath + "/.nomedia");
         final Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -57,18 +56,26 @@ public final class LocalSongsHelper {
                 String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                 String streamUri = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                 String albumId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                String artistId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
+//                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+//                String artistId = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID));
                 String thumb = getPathAlbumArt(albumId, Application.Context);
                 long date = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
                 long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-
-                data.add(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
-                Log.d("data", new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb).toString());
-                AppDataManager.getInstance().saveSong(new SongRealmObject(Integer.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, thumb));
+                data.add(new SongModel(Integer.valueOf(id),
+                        artist,
+                        title,
+                        displayName,
+                        streamUri,
+                        albumId,
+                        date,
+                        duration,
+                        fileSize,
+                        false,
+                        thumb));
             }
             cursor.close();
+            AppDataManager.getInstance().setDataSongLocal(data);
             readFileListener.onDoneScanFile(null);
         }
     }
@@ -104,7 +111,7 @@ public final class LocalSongsHelper {
             public void onScanCompleted(final String path, Uri uri) {
 
 
-                SongRealmObject realmObject = null;
+                SongModel song = null;
 
                 //Some audio may be explicitly marked as not being music
                 String[] projection = {
@@ -139,22 +146,21 @@ public final class LocalSongsHelper {
                         long duration = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                         long fileSize = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-                        realmObject = new SongRealmObject(Long.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, false, getPathAlbumArt(albumId, Application.Context));
+                        song = new SongModel(Long.valueOf(id), artist, title, displayName, streamUri, albumId, date, duration, fileSize, false, getPathAlbumArt(albumId, Application.Context));
                     }
                     cursor.close();
-                    readFileListener.onDoneScanFile(realmObject);
+                    readFileListener.onDoneScanFile(song);
                 }
             }
 
 
+        });
 
-    });
+    }
 
-}
-
-public interface ReadFileListener {
-    void onDoneScanFile(Object o);
-}
+    public interface ReadFileListener {
+        void onDoneScanFile(Object o);
+    }
 
 }
 

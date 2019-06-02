@@ -1,13 +1,7 @@
 package com.example.lmqmusic.ui.main;
 
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.DialogFragment;
@@ -16,25 +10,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.MediaService;
 import com.example.lmqmusic.R;
-import com.example.lmqmusic.SongRealmObjectModel;
-import com.example.lmqmusic.data.AppDataManager;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
 import com.example.lmqmusic.ui.base.activity.BaseActivity;
 import com.example.lmqmusic.ui.base.fragment.BaseFragment;
 import com.example.lmqmusic.ui.home.HomeFragment;
-import com.example.lmqmusic.ui.list_playlist.PlaylistFragment;
-import com.example.lmqmusic.ui.wifi_transfer.WifiTransferFragment;
-import com.example.lmqmusic.utils.LocalSongsHelper;
-import com.hamado.wifitransfer.WifiTransferController;
-import com.hamado.wifitransfer.WifiTransferControllerImpl;
-import com.hamado.wifitransfer.builder.HtmlDescription;
-import com.hamado.wifitransfer.callback.OnFileCallback;
-import com.hamado.wifitransfer.callback.WifiTransferListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ncapdevi.fragnav.FragNavController;
 import com.ncapdevi.fragnav.FragNavTransactionOptions;
 import com.roughike.bottombar.BottomBar;
@@ -45,7 +29,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -74,7 +58,6 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
     private final int TAB_WIFI_TRANSFER = FragNavController.TAB2;
     private final int TAB_SETTINGS = FragNavController.TAB3;
     private List<Fragment> fragments = new ArrayList<>();
-    List<SongRealmObjectModel> data = new ArrayList<>();
     private FragNavController mNavController;
 
     @Override
@@ -87,12 +70,21 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
         initBottomBar(savedInstanceState);
         initSlidingLayout();
 
+        Gson gson = new Gson();
+        List<Integer> arr = new ArrayList<>();
+        arr.add(1);
+        arr.add(2);
+        arr.add(3);
+        arr.add(4);
+
+        String s = gson.toJson(arr);
+        Type type = new TypeToken<List<Integer>>(){}.getType();
+        List<Integer> arr1 = gson.fromJson(s,type);
+        Log.e("hihi",s);
+        Log.e("hihi",arr1 + "");
+
+
     }
-
-
-
-
-
 
     @Override
     protected void initControls() {
@@ -208,7 +200,8 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
 
     @Override
     public void DownSliding() {
-        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        if (slidingLayout != null)
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
     }
 
     @Override
@@ -223,6 +216,11 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 
 
+    }
+
+    @Override
+    public SlidingUpPanelLayout.PanelState getSlideState() {
+        return slidingLayout.getPanelState();
     }
 
     @Override
@@ -243,6 +241,7 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
         serviceIntent.setAction(command);
         Application.Context.startService(serviceIntent);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -8,6 +8,8 @@ import com.example.lmqmusic.data.model.Item;
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.data.model.realm.PlayListRealmObject;
 import com.example.lmqmusic.data.model.realm.SongRealmObject;
+import com.example.lmqmusic.data.prefs.AppPreferencesHelper;
+import com.example.lmqmusic.data.prefs.PreferencesHelper;
 import com.example.lmqmusic.utils.ModelHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,17 +18,20 @@ import com.google.gson.reflect.TypeToken;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AppDataManager implements DataManager {
     private List<SongModel> dataLocalSong = new ArrayList<>();
     private List<SongModel> dataNowPlaying;
+    private List<SongModel> favoriteList = new ArrayList<>();
     private static AppDataManager INSTANCE;
     private final Gson mGson;
     private List<Item> itemListDashBoard;
     DatabaseHelper databaseHelper;
+    PreferencesHelper mPreferencesHelper;
     List<PlayListRealmObject> listPlaylist;
-    List<SongRealmObject> listSong;
 
     private AppDataManager() {
         mGson = new GsonBuilder()
@@ -35,6 +40,7 @@ public class AppDataManager implements DataManager {
         databaseHelper = AppDatabaseHelper.getINSTANCE();
         dataLocalSong.addAll(getAllSong());
         dataNowPlaying = dataLocalSong;
+        mPreferencesHelper = new AppPreferencesHelper(Application.Context);
         listPlaylist = getAllPlaylist();
     }
 
@@ -46,8 +52,6 @@ public class AppDataManager implements DataManager {
     }
 
     public List<SongModel> getDataLocalSong() {
-        this.dataLocalSong.clear();
-        this.dataLocalSong.addAll(ModelHelper.ConvertSongRealmObjectToSongModel(databaseHelper.getAllSong()));
         return this.dataLocalSong;
     }
 
@@ -98,33 +102,14 @@ public class AppDataManager implements DataManager {
         databaseHelper.addSongToPlaylist(playlistId, song);
     }
 
-    @Override
-    public PlayListRealmObject getPlaylist(long id) {
-        return null;
-    }
+
 
     @Override
-    public void addSongToFavorite(SongModel song) {
-
-        SongRealmObject object = ModelHelper.ConvertSongModelToSongRealmObject(song);
-        databaseHelper.updateSong(object);
+    public void saveSong(SongModel song) {
+        dataLocalSong.add(song);
     }
 
-    @Override
-    public void saveSong(SongRealmObject song) {
 
-        databaseHelper.saveSong(song);
-    }
-
-    @Override
-    public SongModel getSong(long songId) {
-        return ModelHelper.ConvertSongRealmObjectToSongModel(databaseHelper.getSong(songId));
-    }
-
-    @Override
-    public List<SongModel> getAllFavoritesSong() {
-        return ModelHelper.ConvertSongRealmObjectToSongModel(databaseHelper.getAllFavoritesSong());
-    }
 
     @Override
     public List<SongModel> getAllSong() {
@@ -150,5 +135,48 @@ public class AppDataManager implements DataManager {
     @Override
     public void removeSongOfPlaylist(long playlistId, SongModel songModel) {
         databaseHelper.removeSongOfPlaylist(playlistId, ModelHelper.ConvertSongModelToSongRealmObject(songModel));
+    }
+
+    @Override
+    public void setDataSongLocal(List<SongModel> songs) {
+        if (songs != null) {
+            this.dataLocalSong = songs;
+            getFavoriteList();
+        }
+    }
+
+    @Override
+    public List<SongModel> getFavoriteList() {
+        favoriteList.clear();
+        List<Integer> temp = mPreferencesHelper.getAllFavorite();
+        Map<Integer, Integer> mMap = new HashMap<>();
+        if (temp.size() > 0) {
+            for(Integer id : temp)
+            {
+                mMap.put(id,id);
+            }
+            for(SongModel song : dataLocalSong)
+            {
+                if(mMap.get((int)song.getId()) != null && song.getId() == mMap.get((int)song.getId())){
+                    song.setFavorite(true);
+                    favoriteList.add(song);
+                }
+                else{
+                    song.setFavorite(false);
+                }
+            }
+            return favoriteList;
+        }
+        return favoriteList;
+    }
+
+    @Override
+    public void setFavorite(int songId) {
+        mPreferencesHelper.setNewFavorite(songId);
+    }
+
+    @Override
+    public void unFavorite(int songId) {
+        mPreferencesHelper.unFavorite(songId);
     }
 }

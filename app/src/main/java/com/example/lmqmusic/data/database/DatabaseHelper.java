@@ -35,4 +35,6 @@ public interface DatabaseHelper {
     List<SongRealmObject> getSongsFromPlaylist(long playlistId);
 
     void removeSongOfPlaylist(long playlistId, SongRealmObject songRealmObject);
+
+    void updatePlaylist(PlayListRealmObject playListRealmObject);
 }

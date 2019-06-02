@@ -31,6 +31,7 @@ import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.alarm.AlarmFragment;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
 import com.example.lmqmusic.ui.playlist_action.PlaylistActionBottomSheetFragment;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -114,6 +115,10 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     private PlayerViewModel mViewModel;
 
     Handler handler = new Handler();
+
+    PlaylistActionBottomSheetFragment mPlaylistActionBottomSheetFragment;
+
+    PlaylistDialogFragment mPlaylistDialogFragment;
 
     public static PlayerFragment newInstance() {
         return new PlayerFragment();
@@ -228,8 +233,8 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
 
     @OnClick(R.id.button_playlist)
     void showPlaylist() {
-        PlaylistDialogFragment playlistDialogFragment = PlaylistDialogFragment.newInstance();
-        getFragNav().showBottomSheetDialogFragment(playlistDialogFragment);
+        mPlaylistDialogFragment = PlaylistDialogFragment.newInstance();
+        getFragNav().showBottomSheetDialogFragment(mPlaylistDialogFragment);
     }
 
     @OnClick(R.id.button_pause_playback)
@@ -261,9 +266,13 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
 
     @Override
     public void onStateChanged(boolean isPlaying) {
+        if (!this.isPlaying && this.isPlaying != isPlaying) {
+            if(getSliding().getSlideState() == SlidingUpPanelLayout.PanelState.HIDDEN){
+                getSliding().showSliding();
+            }
+        }
         this.isPlaying = isPlaying;
         if (isPlaying) {
-            getSliding().showSliding();
             mButtonPausePlayBack.setVisibility(View.VISIBLE);
             mButtonPlayPlayBack.setVisibility(View.INVISIBLE);
             mButtonPlay.setVisibility(View.INVISIBLE);
@@ -295,8 +304,8 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
     public void onObserveCurrentPositionMediaPlayer(long currentPosition, SongModel songModel) {
         if (songModel == null) return;
         this.song = songModel;
-        Glide.with(this).load(songModel.getThumb()).dontTransform().dontAnimate().into(mLogo);
-        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mImagePlayback);
+        Glide.with(Application.Context).load(song.getThumb()).placeholder(R.drawable.no_image).dontTransform().dontAnimate().into(mLogo);
+        Glide.with(Application.Context).load(song.getThumb()).placeholder(R.drawable.no_image).dontTransform().dontAnimate().into(mImagePlayback);
         mTextSongName.setText(song.getTitle());
         mTextSongArtist.setText(song.getArtist());
         mSeekBar.setMax((int) song.getDuration());
@@ -304,16 +313,14 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
         mTextSongArtistPlayBack.setText(song.getArtist());
         mTextSongNamePlayBack.setText(song.getTitle());
         mButtonFavorite.setImageResource(song.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-        mediaController.seekTo((int) currentPosition);
         runCommand(isPlaying ? Constants.ACTION.PLAY_ACTION : Constants.ACTION.PAUSE_ACTION);
-        getSliding().showSliding();
     }
 
     @Override
     public void onSongChanged(SongModel song) {
         this.song = song;
-        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mLogo);
-        Glide.with(Application.Context).load(song.getThumb()).dontTransform().dontAnimate().into(mImagePlayback);
+        Glide.with(Application.Context).load(song.getThumb()).placeholder(R.drawable.no_image).dontTransform().dontAnimate().into(mLogo);
+        Glide.with(Application.Context).load(song.getThumb()).placeholder(R.drawable.no_image).dontTransform().dontAnimate().into(mImagePlayback);
 
         mTextSongName.setText(song.getTitle());
         mTextSongArtist.setText(song.getArtist());
@@ -322,14 +329,18 @@ public class PlayerFragment extends FragmentMVP<PlayerPresenter, IPlayer> implem
         mTextSongArtistPlayBack.setText(song.getArtist());
         mTextSongNamePlayBack.setText(song.getTitle());
         mButtonFavorite.setImageResource(song.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-        getSliding().showSliding();
     }
 
     @OnClick(R.id.button_favorite)
     void clickFavorite() {
         song.setFavorite(!song.isFavorite());
         mButtonFavorite.setImageResource(song.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-        mPresenter.saveSongToFavorite(song);
+        if (song.isFavorite()) {
+            mPresenter.saveSongToFavorite(song);
+        } else {
+            mPresenter.unFavorite(song);
+        }
+
     }
 
     @SuppressLint("RestrictedApi")

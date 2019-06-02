@@ -10,6 +10,11 @@ public class FavoritePresenter extends FragmentPresenterMVP<IFavoriteView> imple
     AppDataManager mDataManager = AppDataManager.getInstance();
     @Override
     public List<SongModel> getDataFavorite() {
-        return mDataManager.getAllFavoritesSong();
+        return mDataManager.getFavoriteList();
+    }
+
+    @Override
+    public void updateSong(SongModel songModel) {
+        mDataManager.updateSong(songModel);
     }
 }

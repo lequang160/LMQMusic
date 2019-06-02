@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.lmqmusic.ui.main.Main2Activity;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public abstract class BaseFragment extends DialogFragment {
 
@@ -76,7 +77,7 @@ public abstract class BaseFragment extends DialogFragment {
     public interface SlidingUpPanelLayoutListener{
         void DownSliding();
         void hideSliding();
-
         void showSliding();
+        SlidingUpPanelLayout.PanelState getSlideState();
     }
 }

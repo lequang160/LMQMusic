@@ -8,6 +8,11 @@ public class PlayerPresenter extends FragmentPresenterMVP<IPlayer> implements IP
     AppDataManager mDataManager = AppDataManager.getInstance();
     @Override
     public void saveSongToFavorite(SongModel song){
-        mDataManager.updateSong(song);
+        mDataManager.setFavorite((int) song.getId());
+    }
+
+    @Override
+    public void unFavorite(SongModel song) {
+        mDataManager.unFavorite((int) song.getId());
     }
 }

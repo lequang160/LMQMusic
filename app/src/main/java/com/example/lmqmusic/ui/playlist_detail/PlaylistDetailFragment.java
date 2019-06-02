@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.Application;
@@ -124,7 +123,7 @@ public class PlaylistDetailFragment extends FragmentMVP<PlaylistDetailPresenter,
     }
 
     private void setupRecycleView(LayoutInflater inflater) {
-        mAdapter = new NowPlayListAdapter(null);
+        mAdapter = new NowPlayListAdapter(null, NowPlayListAdapter.AdapterType.PLAY_LIST);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -154,7 +153,7 @@ public class PlaylistDetailFragment extends FragmentMVP<PlaylistDetailPresenter,
 
         SongModel song = ((SongModel) adapter.getData().get(position));
         PopupMenu popup = new PopupMenu(Application.Context, v);
-        popup.getMenuInflater().inflate(R.menu.song_menu, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.playlist_detail, popup.getMenu());
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem menu_item) {

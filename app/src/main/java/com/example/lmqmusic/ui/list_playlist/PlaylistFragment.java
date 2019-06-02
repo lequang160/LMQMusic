@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.Application;
+import com.example.lmqmusic.Constants;
+import com.example.lmqmusic.MediaController;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.realm.PlayListRealmObject;
@@ -28,6 +30,7 @@ import com.example.lmqmusic.ui.adapter.PlaylistAdapter;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
 import com.example.lmqmusic.ui.list_playlist.dialog_new_playlist.DialogAddPlaylist;
 import com.example.lmqmusic.ui.playlist_detail.PlaylistDetailFragment;
+import com.example.lmqmusic.utils.ModelHelper;
 
 import java.util.List;
 
@@ -152,7 +155,10 @@ public class PlaylistFragment extends FragmentMVP<PlaylistPresenter, IPlaylist> 
             public boolean onMenuItemClick(MenuItem menu_item) {
                 switch (menu_item.getItemId()) {
                     case R.id.add_to_now:
-                        Toast.makeText(mActivity, "add nek", Toast.LENGTH_SHORT).show();
+                        MediaController.newInstance().setDataSource(ModelHelper.ConvertSongRealmObjectToSongModel(((PlayListRealmObject)adapter.getData().get(position)).getListSong()));
+                        MediaController.newInstance().Prepare(0);
+                        mActivity.runCommand(Constants.ACTION.PLAY_ACTION);
+                        //Application.mService.onNotify();
                         break;
                     case R.id.edit:
                         PlayListRealmObject object = (PlayListRealmObject) adapter.getData().get(position);

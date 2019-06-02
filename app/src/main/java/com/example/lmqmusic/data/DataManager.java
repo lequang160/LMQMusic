@@ -17,15 +17,7 @@ public interface DataManager {
 
     void addSongToPlaylist(long playlistId, SongRealmObject song);
 
-    PlayListRealmObject getPlaylist(long id);
-
-    void addSongToFavorite(SongModel song);
-
-    void saveSong(SongRealmObject song);
-
-    SongModel getSong(long songId);
-
-    List<SongModel> getAllFavoritesSong();
+    void saveSong(SongModel song);
 
     List<SongModel> getAllSong();
 
@@ -36,4 +28,12 @@ public interface DataManager {
     List<SongModel> getSongsFromPlaylist(long playlistId);
 
     void removeSongOfPlaylist(long playlistId, SongModel songModel);
+
+    void setDataSongLocal(List<SongModel> songs);
+
+    List<SongModel> getFavoriteList();
+
+    void setFavorite(int songId);
+
+    void unFavorite(int songId);
 }

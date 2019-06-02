@@ -2,8 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/notificationbg"
     android:layout_width="fill_parent"
-    android:layout_height="128.0dip"
-    android:background="@android:color/white">
+    android:layout_height="128dp"
+    android:background="@drawable/bg_notification"
+    android:padding="@dimen/_4sdp">
 
     <ImageView
         android:id="@+id/status_bar_album_art"
@@ -65,24 +66,12 @@
         android:layout_toRightOf="@id/status_bar_album_art"
         android:background="?android:dividerHorizontal" />
 
-    <ImageButton
-        android:id="@id/status_bar_collapse"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:scaleType="fitXY"
-        android:padding="@dimen/_8sdp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:background="?android:selectableItemBackground"
-        android:src="@drawable/ic_close" />
-
     <LinearLayout
         android:id="@+id/textarea"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
-        android:layout_toLeftOf="@id/status_bar_collapse"
         android:layout_toRightOf="@id/status_bar_album_art"
         android:orientation="vertical"
         android:paddingLeft="16dp"
@@ -94,8 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:ellipsize="marquee"
-            android:fadingEdge="horizontal"
-            android:focusable="true"
+            android:textColor="@color/black"
             android:singleLine="true" />
 
         <TextView
@@ -104,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:ellipsize="end"
-            android:fadingEdge="horizontal"
+            android:textColor="@color/black"
             android:maxLines="1" />
 
         <TextView
@@ -113,7 +101,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:ellipsize="end"
-            android:fadingEdge="horizontal"
+            android:textColor="@color/black"
             android:maxLines="1" />
     </LinearLayout>
 </RelativeLayout>

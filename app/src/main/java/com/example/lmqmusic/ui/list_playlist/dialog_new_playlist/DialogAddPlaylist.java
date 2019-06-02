@@ -74,6 +74,7 @@ public class DialogAddPlaylist extends DialogFragment {
                 long id = playListRealmObject.getId();
                 String namePlaylist = mEditText.getText().toString();
                 PlayListRealmObject object = new PlayListRealmObject(id,namePlaylist);
+                object.setListSong(playListRealmObject.getListSong());
                 mListener.onCreate(object);
             }
         }else{

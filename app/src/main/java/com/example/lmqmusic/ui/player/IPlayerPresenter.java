@@ -5,4 +5,5 @@ import com.example.lmqmusic.ui.base.activity.MvpPresenter;
 
 public interface IPlayerPresenter{
     void saveSongToFavorite(SongModel song);
+    void unFavorite(SongModel song);
 }

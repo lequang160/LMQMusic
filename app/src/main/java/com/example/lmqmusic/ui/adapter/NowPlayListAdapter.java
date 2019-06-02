@@ -1,8 +1,6 @@
 package com.example.lmqmusic.ui.adapter;
 
-import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -10,15 +8,17 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.model.SongModel;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
 public class NowPlayListAdapter extends BaseQuickAdapter<SongModel, BaseViewHolder> {
-    public NowPlayListAdapter(@Nullable List<SongModel> data) {
+    private int mType;
+
+    public NowPlayListAdapter(@Nullable List<SongModel> data, int type) {
         super(R.layout.item_playlist_nowplaying, data);
+        mType = type;
     }
 
     @Override
@@ -32,11 +32,40 @@ public class NowPlayListAdapter extends BaseQuickAdapter<SongModel, BaseViewHold
         helper.addOnClickListener(R.id.image_more);
         ImageView imageView = helper.getView(R.id.image);
         Glide.with(mContext)
-                .load(Uri.parse(item.getThumb()))
+                .load(item.getThumb())
                 .dontAnimate()
                 .dontTransform()
-                .placeholder(R.drawable.ic_music_player_song)
+                .placeholder(R.drawable.no_image)
                 .into(imageView);
+
+        switch (mType) {
+            case AdapterType.SONG_FRAGMENT:
+                helper.setVisible(R.id.image_more, true);
+                break;
+            case AdapterType.PLAY_LIST:
+                helper.setVisible(R.id.image_more, true);
+                break;
+            case AdapterType.FAVORITE:
+                helper.setVisible(R.id.image_more, true);
+                break;
+
+        }
+        helper.addOnClickListener(R.id.image_more);
+    }
+
+    public void setType(int type) {
+        this.mType = type;
+    }
+
+    public int getType() {
+        return mType;
+    }
+
+    public @interface AdapterType {
+        int SONG_FRAGMENT = 0;
+        int NOW_PLAYING = 1;
+        int FAVORITE = 2;
+        int PLAY_LIST = 3;
     }
 
 }
