@@ -15,14 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Main3Activity"></activity>
+
         <service
             android:name=".MediaService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
-            android:name=".ui.main.Main2Activity"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:name=".ui.main.MainActivity"
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".ui.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,6 +36,8 @@
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
+
+        <receiver android:name=".MyReceiver" />
     </application>
 
 </manifest>

@@ -97,6 +97,7 @@ public class WifiTransferControllerImpl implements WifiTransferController {
         if (!WifiTransferUtils.isWifiConnected(context)) {
             if (wifiTransferListener != null)
                 wifiTransferListener.onLostConnection();
+
             return;
         }
 

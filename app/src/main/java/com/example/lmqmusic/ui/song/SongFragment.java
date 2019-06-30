@@ -31,7 +31,7 @@ import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.adapter.NowPlayListAdapter;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
-import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.main.MainActivity;
 import com.example.lmqmusic.ui.playlist_action.PlaylistActionBottomSheetFragment;
 
 import java.util.ArrayList;
@@ -78,9 +78,9 @@ public class SongFragment extends FragmentMVP<SongPresenter, ISongView> implemen
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                MediaController.newInstance().setDataSource(data);
+                MediaController.newInstance().setDataSource(adapter.getData());
                 MediaController.newInstance().PlayAtPosition(position);
-                ((Main2Activity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
+                ((MainActivity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
             }
         });
         return rootView;

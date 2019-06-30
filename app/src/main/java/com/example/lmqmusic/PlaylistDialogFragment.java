@@ -14,9 +14,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.adapter.NowPlayListAdapter;
-import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.main.MainActivity;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -67,7 +66,7 @@ public class PlaylistDialogFragment extends BottomSheetDialogFragment {
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 MediaController.newInstance().setDataSource(mData);
                 MediaController.newInstance().PlayAtPosition(position);
-                ((Main2Activity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
+                ((MainActivity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
             }
         });
         mRecyclerView.post(new Runnable() {

@@ -14,7 +14,7 @@ public class FavoritePresenter extends FragmentPresenterMVP<IFavoriteView> imple
     }
 
     @Override
-    public void updateSong(SongModel songModel) {
-        mDataManager.updateSong(songModel);
+    public void unFavorite(SongModel songModel) {
+        mDataManager.unFavorite((int) songModel.getId());
     }
 }

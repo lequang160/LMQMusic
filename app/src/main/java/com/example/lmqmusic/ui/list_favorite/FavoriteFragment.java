@@ -23,13 +23,11 @@ import android.view.ViewGroup;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.Application;
 import com.example.lmqmusic.Constants;
-import com.example.lmqmusic.MediaController;
 import com.example.lmqmusic.R;
-import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
 import com.example.lmqmusic.ui.adapter.NowPlayListAdapter;
 import com.example.lmqmusic.ui.base.fragment.FragmentMVP;
-import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,9 +124,9 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
         mAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                MediaController.newInstance().setDataSource(mData);
-                MediaController.newInstance().PlayAtPosition(position);
-                ((Main2Activity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
+                Application.mService.setDataSource(adapter.getData());
+                Application.mService.PlayAtPosition(position);
+                ((MainActivity) Objects.requireNonNull(getActivity())).runCommand(Constants.ACTION.PLAY_ACTION);
             }
         });
 
@@ -171,11 +169,10 @@ public class FavoriteFragment extends FragmentMVP<FavoritePresenter, IFavoriteVi
                     case R.id.remove_song:
                         SongModel songModel = (SongModel) adapter.getData().get(position);
                         songModel.setFavorite(false);
-                        mPresenter.updateSong(songModel);
+                        mPresenter.unFavorite(songModel);
                         mData = mPresenter.getDataFavorite();
                         mViewModel.setData(mData);
                         break;
-
                 }
                 return true;
             }

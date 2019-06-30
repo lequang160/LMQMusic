@@ -10,14 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.main.MainActivity;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public abstract class BaseFragment extends DialogFragment {
 
     protected FragNavListener mFragNav;
 
-    protected Main2Activity mActivity;
+    protected MainActivity mActivity;
 
     protected  SlidingUpPanelLayoutListener mSlidingup;
 
@@ -58,7 +58,7 @@ public abstract class BaseFragment extends DialogFragment {
                     + " must implement FragNavListener");
         }
 
-        mActivity = (Main2Activity) context;
+        mActivity = (MainActivity) context;
 
     }
 

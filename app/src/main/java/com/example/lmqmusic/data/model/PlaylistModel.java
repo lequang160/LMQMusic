@@ -1,38 +1,35 @@
 package com.example.lmqmusic.data.model;
 
-import com.chad.library.adapter.base.entity.MultiItemEntity;
+import java.util.List;
 
-import io.realm.RealmObject;
+public class PlaylistModel {
+    private int id;
 
-public class PlaylistModel implements MultiItemEntity{
-    String name;
-    int countSong;
+    private String name = "";
 
-    int type;
+    private List<Integer> songList;
 
-    public PlaylistModel() {
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public PlaylistModel(String name, int countSong, int type) {
+    public PlaylistModel(int id, String name, List<Integer> songList) {
+        this.id = id;
         this.name = name;
-        this.countSong = countSong;
-        this.type = type;
+        this.songList = songList;
     }
 
-    public int getCountSong() {
-        return countSong;
+    public PlaylistModel(int id) {
+        this.id = id;
     }
 
-    public void setCountSong(int countSong) {
-        this.countSong = countSong;
+    public PlaylistModel(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -43,8 +40,11 @@ public class PlaylistModel implements MultiItemEntity{
         this.name = name;
     }
 
-    @Override
-    public int getItemType() {
-        return type;
+    public List<Integer> getSongList() {
+        return songList;
+    }
+
+    public void setSongList(List<Integer> songList) {
+        this.songList = songList;
     }
 }

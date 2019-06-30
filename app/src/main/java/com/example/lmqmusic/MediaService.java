@@ -15,6 +15,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -43,6 +44,8 @@ public class MediaService extends Service {
     private boolean isEndOfSong = false;
     NotificationManager notificationManager;
 
+    private int currentSongId = 0;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -50,6 +53,7 @@ public class MediaService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d("onBind service", "onBind");
         return mBinder;
     }
 
@@ -65,8 +69,17 @@ public class MediaService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("onCreate service", "onCreate");
         initPlayer();
         createNotificationChannel();
+        Handler abc = new Handler();
+        abc.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("onCreate service", "onCreate");
+                abc.postDelayed(this, 1000);
+            }
+        },1000);
     }
 
     private void initPlayer() {
@@ -165,6 +178,7 @@ public class MediaService extends Service {
             mMediaPlayer.setDataSource(song.getStreamUri());
             mMediaPlayer.prepare();
             mListener.onSongChanged(song);
+            currentSongId = (int) song.getId();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -227,8 +241,10 @@ public class MediaService extends Service {
 //        }
         if (!intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             SongModel song;
-            song = songList.get(currentIndex);
-            createNotification(song.getDisplayName(), song.getArtist(), "", song.getThumb(), isPlaying);
+            if(songList != null && songList.size() > currentIndex) {
+                song = songList.get(currentIndex);
+                createNotification(song.getDisplayName(), song.getArtist(), "", song.getThumb(), isPlaying);
+            }
         }
         return START_STICKY;
     }
@@ -240,6 +256,7 @@ public class MediaService extends Service {
     public int getPosition() {
         if (mMediaPlayer != null) {
             return mMediaPlayer.getCurrentPosition();
+
         }
         return 0;
     }
@@ -309,23 +326,28 @@ public class MediaService extends Service {
 
         bigViews.setTextViewText(R.id.status_bar_album_name, playlist == null ? "" : playlist);
 
-        bigViews.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
-        views.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
+        if(!thumb.isEmpty()) {
+            bigViews.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
+            views.setImageViewUri(R.id.status_bar_icon, Uri.parse(thumb));
+        }
 
         if (status == null)
             status = new NotificationCompat.Builder(this, CHANNEL_ID).setAutoCancel(!isPlaying).build();
         status.contentView = views;
         status.bigContentView = bigViews;
-        status.icon = R.drawable.ic_music_player_song;
+        status.icon = R.mipmap.ic_launcher;
         status.contentIntent = pendingIntent;
 
         // hide the notification after its selected
         if(isPlaying) {
-            status.flags = Notification.FLAG_FOREGROUND_SERVICE;
+            startForeground(Constants.NOTIFICATION_ID, status);
         }else{
-            status.flags = Notification.FLAG_AUTO_CANCEL;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(Service.STOP_FOREGROUND_DETACH);
+            }
+            status.flags |= Notification.FLAG_AUTO_CANCEL;
+            notificationManager.notify(Constants.NOTIFICATION_ID, status);
         }
-        startForeground(Constants.NOTIFICATION_ID, status);
     }
 
     private void createNotificationChannel() {
@@ -380,6 +402,10 @@ public class MediaService extends Service {
         mAlarm.start();
     }
 
+    public int getCurrentSongId(){
+        return currentSongId;
+    }
+
     public void isEndOfSong(boolean isEndOfSong) {
         this.isEndOfSong = isEndOfSong;
         if (mAlarm != null) {
@@ -405,6 +431,8 @@ public class MediaService extends Service {
     public void onRebind(Intent intent) {
         super.onRebind(intent);
     }
+
+
 
 
     public class MediaBinder extends Binder {

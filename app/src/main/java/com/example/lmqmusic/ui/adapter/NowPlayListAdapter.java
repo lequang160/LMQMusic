@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.example.lmqmusic.Application;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.model.SongModel;
 
@@ -51,6 +52,13 @@ public class NowPlayListAdapter extends BaseQuickAdapter<SongModel, BaseViewHold
 
         }
         helper.addOnClickListener(R.id.image_more);
+        int songId = Application.mService.getCurrentSongId();
+        if(songId != 0 && songId == item.getId()){
+            helper.setVisible(R.id.image_sync, true);
+        }else{
+            helper.setVisible(R.id.image_sync, false);
+        }
+
     }
 
     public void setType(int type) {

@@ -1,6 +1,7 @@
 package com.example.lmqmusic.ui.main;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -36,7 +37,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 
-public class Main2Activity extends BaseActivity implements IMain, OnTabReselectListener, OnTabSelectListener, BaseFragment.FragNavListener, FragNavController.RootFragmentListener, BaseFragment.SlidingUpPanelLayoutListener {
+public class MainActivity extends BaseActivity implements IMain, OnTabReselectListener, OnTabSelectListener, BaseFragment.FragNavListener, FragNavController.RootFragmentListener, BaseFragment.SlidingUpPanelLayoutListener {
 
 
     @BindView(R.id.sliding_layout)
@@ -218,9 +219,14 @@ public class Main2Activity extends BaseActivity implements IMain, OnTabReselectL
 
     }
 
+
+
     @Override
     public SlidingUpPanelLayout.PanelState getSlideState() {
-        return slidingLayout.getPanelState();
+        if (slidingLayout != null)
+            return slidingLayout.getPanelState();
+        else
+            return SlidingUpPanelLayout.PanelState.HIDDEN;
     }
 
     @Override

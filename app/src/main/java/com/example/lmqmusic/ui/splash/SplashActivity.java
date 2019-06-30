@@ -18,12 +18,9 @@ import com.example.lmqmusic.Application;
 import com.example.lmqmusic.R;
 import com.example.lmqmusic.data.AppDataManager;
 import com.example.lmqmusic.data.model.SongModel;
-import com.example.lmqmusic.data.model.realm.SongRealmObject;
-import com.example.lmqmusic.ui.main.Main2Activity;
+import com.example.lmqmusic.ui.main.MainActivity;
 import com.example.lmqmusic.utils.FileUtils;
 import com.example.lmqmusic.utils.LocalSongsHelper;
-import com.example.lmqmusic.utils.ModelHelper;
-import com.hamado.wifitransfer.utils.FileHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +47,7 @@ public class SplashActivity extends AppCompatActivity implements EasyPermissions
     }
 
     private void goMain() {
-        Intent intent = new Intent(this, Main2Activity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         this.startActivity(intent);
     }
 

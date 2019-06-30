@@ -19,6 +19,7 @@ public class Constants {
 
     public interface Extra{
         public static String FAVORITE = "FAVORITE";
+        public static String PLAYLIST = "PLAYLIST";
     }
 
 

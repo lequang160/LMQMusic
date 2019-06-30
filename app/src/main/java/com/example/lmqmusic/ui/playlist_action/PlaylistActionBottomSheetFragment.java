@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.lmqmusic.Application;
@@ -29,11 +28,9 @@ import com.example.lmqmusic.data.model.realm.PlayListRealmObject;
 import com.example.lmqmusic.ui.adapter.PlaylistAdapter;
 import com.example.lmqmusic.ui.list_playlist.PlaylistViewModel;
 import com.example.lmqmusic.ui.list_playlist.dialog_new_playlist.DialogAddPlaylist;
-import com.example.lmqmusic.ui.main.Main2Activity;
 import com.example.lmqmusic.utils.ModelHelper;
 
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
